@@ -1,7 +1,7 @@
 
 
 var express = require('express');
-var fortune = require('./lib/fortune.js')
+var fortune = require('./lib/fortune.js');
 
 var app = express();
 
@@ -18,6 +18,14 @@ app.set('port', process.env.PORT || 3000);
 
 app.use(express.static(__dirname + '/public'));
 
+// this inserts a switch to turn on middleware testing
+// it has to be before the routes
+
+app.use(function(req, res, next){
+     res.locals.showTests = app.get('env') !== 'production' &&
+           req.query.test === '1';
+     next();
+});
 
 // these are routes to various pages
 
@@ -28,8 +36,6 @@ app.get('/', function(req, res){
 
 app.get('/about', function(req, res){
      res.render('about', { fortune: fortune.getFortune() } );
-    
-     res.render('about', {fortune: randomFortune});
 });
 
 // custom 404 page
